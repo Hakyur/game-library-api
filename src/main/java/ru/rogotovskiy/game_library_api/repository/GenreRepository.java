@@ -6,4 +6,5 @@ import ru.rogotovskiy.game_library_api.entity.Genre;
 
 @Repository
 public interface GenreRepository extends JpaRepository<Genre, Integer> {
+    boolean existsByName(String name);
 }
