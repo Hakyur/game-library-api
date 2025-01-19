@@ -5,7 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.rogotovskiy.game_library_api.dto.ErrorResponse;
-import ru.rogotovskiy.game_library_api.exceptions.DuplicateGenreException;
+import ru.rogotovskiy.game_library_api.exceptions.DuplicateObjectException;
 import ru.rogotovskiy.game_library_api.exceptions.ObjectNotFoundException;
 
 import java.time.LocalDateTime;
@@ -20,7 +20,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler
-    public ResponseEntity<ErrorResponse> handleDuplicateGenreException(DuplicateGenreException e) {
+    public ResponseEntity<ErrorResponse> handleDuplicateObjectException(DuplicateObjectException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(toErrorResponse(e));
     }
 

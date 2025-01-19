@@ -37,13 +37,13 @@ public class GenreService {
         return genreMapper.toBasicDTO(genre);
     }
 
-    public void createGenre(GenreBasicDTO genreDTO) {
+    public Genre createGenre(GenreBasicDTO genreDTO) {
         if (genreRepository.existsByName(genreDTO.name())) {
             throw new DuplicateGenreException(
                     String.format(DUPLICATE_GENRE_TEMPLATE, genreDTO.name())
             );
         }
-        genreRepository.save(genreMapper.toEntity(genreDTO));
+        return genreRepository.save(genreMapper.toEntity(genreDTO));
     }
 
     public void deleteGenre(Integer id) {
@@ -51,7 +51,7 @@ public class GenreService {
         genreRepository.delete(genre);
     }
 
-    public void updateGenre(Integer id, GenreBasicDTO genreDTO) {
+    public Genre updateGenre(Integer id, GenreBasicDTO genreDTO) {
         Genre genre = getGenreById(id);
         if (genreDTO.name() != null && !genreDTO.name().equals(genre.getName())) {
             if (genreRepository.existsByName(genreDTO.name())) {
@@ -64,6 +64,6 @@ public class GenreService {
         if (genreDTO.description() != null) {
             genre.setDescription(genreDTO.description());
         }
-        genreRepository.save(genre);
+        return genreRepository.save(genre);
     }
 }
