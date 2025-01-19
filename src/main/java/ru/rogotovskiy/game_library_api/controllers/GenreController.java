@@ -4,6 +4,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.rogotovskiy.game_library_api.dto.GenreBasicDTO;
 import ru.rogotovskiy.game_library_api.dto.SuccessResponse;
+import ru.rogotovskiy.game_library_api.entity.Genre;
 import ru.rogotovskiy.game_library_api.service.GenreService;
 
 @RestController
@@ -27,7 +28,7 @@ public class GenreController {
 
     @PostMapping("/create")
     public ResponseEntity<?> createGenre(@RequestBody GenreBasicDTO genreDTO) {
-        genreService.createGenre(genreDTO);
+        Genre genre = genreService.createGenre(genreDTO);
         return ResponseEntity.ok(new SuccessResponse("Жанр успешно создан"));
     }
 
@@ -39,7 +40,7 @@ public class GenreController {
 
     @PutMapping("/update")
     public ResponseEntity<?> updateGenre(@RequestParam Integer id, @RequestBody GenreBasicDTO genreDTO) {
-        genreService.updateGenre(id, genreDTO);
+        Genre genre = genreService.updateGenre(id, genreDTO);
         return ResponseEntity.ok(new SuccessResponse("Жанр успешно обновлён"));
     }
 
