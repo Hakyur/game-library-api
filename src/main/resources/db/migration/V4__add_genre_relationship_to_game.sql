@@ -1,0 +1,8 @@
+ALTER TABLE games
+ADD COLUMN genre_id INTEGER;
+
+ALTER TABLE games
+ADD CONSTRAINT fk_game_genre
+FOREIGN KEY (genre_id)
+REFERENCES genres (id)
+ON DELETE SET NULL;

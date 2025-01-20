@@ -4,6 +4,8 @@ import org.springframework.stereotype.Component;
 import ru.rogotovskiy.game_library_api.dto.GenreBasicDTO;
 import ru.rogotovskiy.game_library_api.entity.Genre;
 
+import java.util.Collections;
+
 @Component
 public class GenreMapper {
 
@@ -15,6 +17,6 @@ public class GenreMapper {
     }
 
     public Genre toEntity(GenreBasicDTO genreDTO) {
-        return new Genre(null, genreDTO.name(), genreDTO.description());
+        return new Genre(null, genreDTO.name(), genreDTO.description(), Collections.emptyList());
     }
 }

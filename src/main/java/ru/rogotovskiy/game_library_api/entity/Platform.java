@@ -6,6 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "platforms")
 @Getter
@@ -22,4 +25,7 @@ public class Platform {
 
     @Column(length = 500)
     private String description;
+
+    @ManyToMany(mappedBy = "platforms")
+    private List<Game> games = new ArrayList<>();
 }
