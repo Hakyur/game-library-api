@@ -1,10 +1,13 @@
 package ru.rogotovskiy.game_library_api.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.List;
 
 @Entity
 @Table(name = "genres")
@@ -22,5 +25,9 @@ public class Genre {
 
     @Column(length = 500)
     private String description;
+
+    @OneToMany(mappedBy = "genre", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH})
+    @JsonManagedReference
+    private List<Game> games;
 
 }

@@ -4,6 +4,8 @@ import org.springframework.stereotype.Component;
 import ru.rogotovskiy.game_library_api.dto.PlatformBasicDTO;
 import ru.rogotovskiy.game_library_api.entity.Platform;
 
+import java.util.Collections;
+
 @Component
 public class PlatformMapper {
 
@@ -12,6 +14,6 @@ public class PlatformMapper {
     }
 
     public Platform toEntity(PlatformBasicDTO platformDTO) {
-        return new Platform(null, platformDTO.name(), platformDTO.description());
+        return new Platform(null, platformDTO.name(), platformDTO.description(), Collections.emptyList());
     }
 }
