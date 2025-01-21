@@ -1,5 +1,6 @@
 package ru.rogotovskiy.game_library_api.handler;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -11,6 +12,7 @@ import ru.rogotovskiy.game_library_api.exceptions.ObjectNotFoundException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+@Hidden
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
