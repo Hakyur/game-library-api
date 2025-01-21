@@ -3,9 +3,11 @@ package ru.rogotovskiy.game_library_api.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.rogotovskiy.game_library_api.dto.GenreBasicDTO;
+import ru.rogotovskiy.game_library_api.dto.GenreDTO;
 import ru.rogotovskiy.game_library_api.entity.Genre;
 import ru.rogotovskiy.game_library_api.exceptions.DuplicateGenreException;
 import ru.rogotovskiy.game_library_api.exceptions.GenreNotFoundException;
+import ru.rogotovskiy.game_library_api.mapper.FacadeMapper;
 import ru.rogotovskiy.game_library_api.mapper.GenreMapper;
 import ru.rogotovskiy.game_library_api.repository.GenreRepository;
 
@@ -18,6 +20,7 @@ public class GenreService {
     private final String GENRE_NOT_FOUND_TEMPLATE = "Жанр с id = %d не найден!";
     private final String DUPLICATE_GENRE_TEMPLATE = "Жанр с именем %s уже существует!";
     private final GenreRepository genreRepository;
+    private final FacadeMapper facadeMapper;
     private final GenreMapper genreMapper;
 
     public List<Genre> getAll() {
@@ -32,9 +35,9 @@ public class GenreService {
         );
     }
 
-    public GenreBasicDTO getById(Integer id) {
+    public GenreDTO getById(Integer id) {
         Genre genre = getGenreById(id);
-        return genreMapper.toBasicDTO(genre);
+        return facadeMapper.toDTO(genre);
     }
 
     public Genre createGenre(GenreBasicDTO genreDTO) {
