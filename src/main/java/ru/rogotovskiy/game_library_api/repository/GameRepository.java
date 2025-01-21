@@ -6,4 +6,5 @@ import ru.rogotovskiy.game_library_api.entity.Game;
 
 @Repository
 public interface GameRepository extends JpaRepository<Game, Integer> {
+    boolean existsByName(String name);
 }

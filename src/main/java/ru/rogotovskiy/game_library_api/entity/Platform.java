@@ -1,5 +1,6 @@
 package ru.rogotovskiy.game_library_api.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -27,5 +28,6 @@ public class Platform {
     private String description;
 
     @ManyToMany(mappedBy = "platforms")
+    @JsonBackReference
     private List<Game> games = new ArrayList<>();
 }

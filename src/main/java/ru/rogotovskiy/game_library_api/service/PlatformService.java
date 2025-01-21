@@ -3,9 +3,11 @@ package ru.rogotovskiy.game_library_api.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.rogotovskiy.game_library_api.dto.PlatformBasicDTO;
+import ru.rogotovskiy.game_library_api.dto.PlatformDTO;
 import ru.rogotovskiy.game_library_api.entity.Platform;
 import ru.rogotovskiy.game_library_api.exceptions.DuplicatePlatformException;
 import ru.rogotovskiy.game_library_api.exceptions.PlatformNotFoundException;
+import ru.rogotovskiy.game_library_api.mapper.FacadeMapper;
 import ru.rogotovskiy.game_library_api.mapper.PlatformMapper;
 import ru.rogotovskiy.game_library_api.repository.PlatformRepository;
 
@@ -17,6 +19,7 @@ public class PlatformService {
     private final String PLATFORM_NOT_FOUND_TEMPLATE = "Платформа с id = %d не найдена!";
     private final String DUPLICATE_PLATFORM_TEMPLATE = "Платформа с именем %s уже существует!";
     private final PlatformRepository platformRepository;
+    private final FacadeMapper facadeMapper;
     private final PlatformMapper platformMapper;
 
     public List<Platform> getAll() {
@@ -32,9 +35,9 @@ public class PlatformService {
     }
 
 
-    public PlatformBasicDTO getById(Integer id) {
+    public PlatformDTO getById(Integer id) {
         Platform platform = getPlatformById(id);
-        return platformMapper.toBasicDTO(platform);
+        return facadeMapper.toDTO(platform);
     }
 
     public Platform createPlatform(PlatformBasicDTO platformDTO) {
