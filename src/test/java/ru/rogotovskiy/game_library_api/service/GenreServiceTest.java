@@ -7,12 +7,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.rogotovskiy.game_library_api.dto.GenreBasicDTO;
+import ru.rogotovskiy.game_library_api.dto.GenreDTO;
 import ru.rogotovskiy.game_library_api.entity.Genre;
 import ru.rogotovskiy.game_library_api.exceptions.DuplicateGenreException;
 import ru.rogotovskiy.game_library_api.exceptions.GenreNotFoundException;
+import ru.rogotovskiy.game_library_api.mapper.FacadeMapper;
 import ru.rogotovskiy.game_library_api.mapper.GenreMapper;
 import ru.rogotovskiy.game_library_api.repository.GenreRepository;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,6 +32,9 @@ class GenreServiceTest {
     @Mock
     private GenreMapper genreMapper;
 
+    @Mock
+    private FacadeMapper facadeMapper;
+
     @InjectMocks
     private GenreService genreService;
 
@@ -37,12 +43,14 @@ class GenreServiceTest {
     private static final String GENRE_DESCRIPTION = "Some description";
 
     private Genre genre;
-    private GenreBasicDTO genreDTO;
+    private GenreBasicDTO genreBasicDTO;
+    private GenreDTO genreDTO;
 
     @BeforeEach
     void setUp() {
-        genre = new Genre(GENRE_ID, GENRE_NAME, GENRE_DESCRIPTION);
-        genreDTO = new GenreBasicDTO(GENRE_NAME, GENRE_DESCRIPTION);
+        genre = new Genre(GENRE_ID, GENRE_NAME, GENRE_DESCRIPTION, null);
+        genreBasicDTO = new GenreBasicDTO(GENRE_NAME, GENRE_DESCRIPTION);
+        genreDTO = new GenreDTO(GENRE_NAME, GENRE_DESCRIPTION, Collections.emptyList());
     }
 
     @Test
@@ -70,30 +78,48 @@ class GenreServiceTest {
     void testGetGenreByIdNotFound() {
         when(genreRepository.findById(GENRE_ID)).thenReturn(Optional.empty());
 
-        assertThrows(GenreNotFoundException.class, () -> genreService.getGenreById(GENRE_ID));
+        GenreNotFoundException e = assertThrows(GenreNotFoundException.class, () -> genreService.getGenreById(GENRE_ID));
+
+        assertEquals(String.format("Жанр с id = %d не найден!", GENRE_ID), e.getMessage());
         verify(genreRepository).findById(GENRE_ID);
     }
 
     @Test
     void getById() {
+        when(genreRepository.findById(GENRE_ID)).thenReturn(Optional.of(genre));
+        when(facadeMapper.toDTO(genre)).thenReturn(genreDTO);
+
+        GenreDTO result = genreService.getById(GENRE_ID);
+
+        assertEquals(genreDTO, result);
+        verify(genreRepository).findById(GENRE_ID);
+        verify(facadeMapper).toDTO(genre);
+
     }
 
     @Test
     void testCreateGenreSuccess() {
         when(genreRepository.existsByName(GENRE_NAME)).thenReturn(false);
-        when(genreMapper.toEntity(genreDTO)).thenReturn(genre);
+        when(genreMapper.toEntity(genreBasicDTO)).thenReturn(genre);
+        when(genreRepository.save(genre)).thenReturn(genre);
 
-        genreService.createGenre(genreDTO);
+        Genre result = genreService.createGenre(genreBasicDTO);
 
+        assertEquals(genre, result);
         verify(genreRepository).existsByName(GENRE_NAME);
+        verify(genreMapper).toEntity(genreBasicDTO);
         verify(genreRepository).save(genre);
     }
 
     @Test
     void testCreateGenreDuplicate() {
         when(genreRepository.existsByName(GENRE_NAME)).thenReturn(true);
-        assertThrows(DuplicateGenreException.class, () -> genreService.createGenre(genreDTO));
+
+        DuplicateGenreException e = assertThrows(DuplicateGenreException.class, () -> genreService.createGenre(genreBasicDTO));
+
+        assertEquals(String.format("Жанр с именем %s уже существует!", GENRE_NAME), e.getMessage());
         verify(genreRepository).existsByName(GENRE_NAME);
+        verify(genreMapper, never()).toEntity(genreBasicDTO);
         verify(genreRepository, never()).save(any(Genre.class));
     }
 
@@ -111,12 +137,42 @@ class GenreServiceTest {
     void testDeleteGenreNotFound() {
         when(genreRepository.findById(GENRE_ID)).thenReturn(Optional.empty());
 
-        assertThrows(GenreNotFoundException.class, () -> genreService.deleteGenre(GENRE_ID));
+        GenreNotFoundException e = assertThrows(GenreNotFoundException.class, () -> genreService.deleteGenre(GENRE_ID));
+
+        assertEquals(String.format("Жанр с id = %d не найден!", GENRE_ID), e.getMessage());
         verify(genreRepository).findById(GENRE_ID);
         verify(genreRepository, never()).delete(any(Genre.class));
     }
 
     @Test
-    void updateGenre() {
+    void updateGenreSuccess() {
+        Genre updatedGenre = new Genre(GENRE_ID, "Adventure", "Updated description", Collections.emptyList());
+
+        when(genreRepository.findById(GENRE_ID)).thenReturn(Optional.of(genre));
+        when(genreRepository.existsByName("Adventure")).thenReturn(false);
+        when(genreRepository.save(genre)).thenReturn(updatedGenre);
+
+        GenreBasicDTO updateGenre = new GenreBasicDTO("Adventure", "Updated description");
+        Genre result = genreService.updateGenre(GENRE_ID, updateGenre);
+
+        assertEquals(updatedGenre.getName(), result.getName());
+        assertEquals(updatedGenre.getDescription(), result.getDescription());
+        verify(genreRepository).findById(GENRE_ID);
+        verify(genreRepository).existsByName("Adventure");
+        verify(genreRepository).save(genre);
+    }
+
+    @Test
+    void updateGenreFailed() {
+        when(genreRepository.findById(GENRE_ID)).thenReturn(Optional.of(genre));
+        when(genreRepository.existsByName("Adventure")).thenReturn(true);
+
+        GenreBasicDTO updateGenre = new GenreBasicDTO("Adventure", "Exciting games");
+        DuplicateGenreException exception = assertThrows(DuplicateGenreException.class, () -> genreService.updateGenre(1, updateGenre));
+
+        assertEquals("Жанр с именем Adventure уже существует!", exception.getMessage());
+        verify(genreRepository).findById(1);
+        verify(genreRepository).existsByName("Adventure");
+        verify(genreRepository, never()).save(genre);
     }
 }
